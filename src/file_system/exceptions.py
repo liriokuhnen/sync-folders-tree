@@ -28,3 +28,11 @@ class ErrorOnDelete(FileSystemBaseException):
 
 class BlockDeleteOnSource(FileSystemBaseException):
     """Raise when a delete operation on soure is blocked"""
+
+
+class FolderAlreadyExist(FileSystemBaseException):
+    """Raise when try to create a folder that already exist"""
+
+
+class BlockCreateFolderOnSource(FileSystemBaseException):
+    """Raise when a creation folder is blocked on source"""

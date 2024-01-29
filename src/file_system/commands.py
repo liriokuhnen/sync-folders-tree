@@ -6,10 +6,12 @@ import logging
 import os
 import shutil
 
-from src.file_system.exceptions import (BlockDeleteOnSource,
+from src.file_system.exceptions import (BlockCreateFolderOnSource,
+                                        BlockDeleteOnSource,
                                         DestinationPathDoesNotExist,
                                         ErrorOnDelete, FileNotFoundOnDelete,
                                         FileOrDirectoryNotFound,
+                                        FolderAlreadyExist,
                                         SourcePathDoesNotExist)
 
 
@@ -46,7 +48,7 @@ class FileSystemCommands:
         try:
             shutil.copy2(source_path, destination_path)
         except FileNotFoundError as err:
-            logging.warning("Error on copy file %s", err.filename)
+            logging.warning("Error on copy file: %s - %s", err.filename, err.strerror)
             raise FileOrDirectoryNotFound from err
 
 
@@ -62,7 +64,7 @@ class FileSystemCommands:
         if not os.path.isfile(destination_path):
             raise FileNotFoundOnDelete
 
-        # Security check to block delete from source
+        # Security check to block delete on source
         if destination_path.startswith(self._source):
             raise BlockDeleteOnSource
 
@@ -71,6 +73,28 @@ class FileSystemCommands:
         except OSError as err:
             logging.warning("Error on delete: %s - %s.", err.filename, err.strerror)
             raise ErrorOnDelete from err
+
+
+    def create_folder(self, folder: str) -> None:
+        """
+        Create folder on destination
+
+        :raises:
+            FileExistsError: when a folder already exist
+        """
+        folder_path = os.path.join(self._destination, folder)
+
+        # Security check to block create folder on source
+        if folder_path.startswith(self._source):
+            raise BlockCreateFolderOnSource
+
+        try:
+            os.mkdir(folder_path)
+        except (FileExistsError, FileNotFoundError) as err:
+            logging.warning(
+                "Error on create folder %s - %s.", err.filename, err.strerror
+            )
+            raise FolderAlreadyExist from err
 
 
     def _check_root_folders(self):
