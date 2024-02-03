@@ -45,8 +45,8 @@ class FileSystemCommands:
         :raises:
             FileOrDirectoryNotFound: if file or directory is not found.
         """
-        source_path = os.path.join(self._source, path, filename)
-        destination_path = os.path.join(self._destination, path)
+        source_path = os.path.normpath(os.path.join(self._source, path, filename))
+        destination_path = os.path.normpath(os.path.join(self._destination, path))
 
         try:
             shutil.copy2(source_path, destination_path)
@@ -62,7 +62,9 @@ class FileSystemCommands:
         :raises:
             FileNotFoundOnDelete: if file not found on destination.
         """
-        destination_path = os.path.join(self._destination, path, filename)
+        destination_path = os.path.normpath(
+            os.path.join(self._destination, path, filename)
+        )
 
         if not os.path.isfile(destination_path):
             raise FileNotFoundOnDelete
@@ -85,7 +87,7 @@ class FileSystemCommands:
         :raises:
             FileExistsError: when a folder already exist
         """
-        folder_path = os.path.join(self._destination, folder)
+        folder_path = os.path.normpath(os.path.join(self._destination, folder))
 
         # Security check to block create folder on source
         if folder_path.startswith(self._source):
@@ -106,6 +108,8 @@ class FileSystemCommands:
 
         :raises:
             FolderNotFoundOnDelete: when folder to delete is not found
+            BlockDeleteOfDestinationFolder: block to prevent delete root destination
+            ErrorOnDeleteFolder: when a os error happen in the delete
         """
         folder_path = os.path.normpath(os.path.join(self._destination, folder))
 
