@@ -10,11 +10,12 @@ from src.file_system.exceptions import (BlockCreateFolderOnSource,
                                         BlockDeleteOfDestinationFolder,
                                         BlockDeleteOnSource,
                                         DestinationPathDoesNotExist,
-                                        ErrorOnDelete, ErrorOnDeleteFolder,
+                                        ErrorOnCreateFolder, ErrorOnDelete,
+                                        ErrorOnDeleteFolder,
                                         FileNotFoundOnDelete,
                                         FileOrDirectoryNotFound,
-                                        FolderAlreadyExist,
                                         FolderNotFoundOnDelete,
+                                        SourceAndDestinationAreEquals,
                                         SourcePathDoesNotExist)
 
 
@@ -61,6 +62,8 @@ class FileSystemCommands:
 
         :raises:
             FileNotFoundOnDelete: if file not found on destination.
+            BlockDeleteOnSource: block delete file on source.
+            ErrorOnDelete: when os error happen on delete file
         """
         destination_path = os.path.normpath(
             os.path.join(self._destination, path, filename)
@@ -85,7 +88,8 @@ class FileSystemCommands:
         Create folder on destination
 
         :raises:
-            FileExistsError: when a folder already exist
+            ErrorOnCreateFolder: when a folder already exist or is not found.
+            BlockCreateFolderOnSource: block create folder on source.
         """
         folder_path = os.path.normpath(os.path.join(self._destination, folder))
 
@@ -99,7 +103,7 @@ class FileSystemCommands:
             logging.warning(
                 "Error on create folder %s - %s.", err.filename, err.strerror
             )
-            raise FolderAlreadyExist from err
+            raise ErrorOnCreateFolder from err
 
 
     def delete_folder(self, folder: str) -> None:
@@ -131,10 +135,13 @@ class FileSystemCommands:
 
     def _check_root_folders(self):
         """
-        Check if both source and destination folders exist
+        Check settings of source and destination
         """
         if not os.path.isdir(self._source):
             raise SourcePathDoesNotExist
 
         if not os.path.isdir(self._destination):
             raise DestinationPathDoesNotExist
+
+        if self._source == self._destination:
+            raise SourceAndDestinationAreEquals
