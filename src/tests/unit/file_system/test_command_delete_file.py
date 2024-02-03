@@ -42,6 +42,7 @@ def test_delete_file_from_destination(tmp_source, tmp_destination):
 
 
 def test_not_allow_delete_file_from_source(tmp_source, tmp_destination):
+    path = "../source/"
     filename = "filename.txt"
     file_path_source = os.path.join(str(tmp_source), filename)
 
@@ -49,9 +50,9 @@ def test_not_allow_delete_file_from_source(tmp_source, tmp_destination):
 
     assert os.path.isfile(file_path_source)
 
-    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_source))
+    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_destination))
     with pytest.raises(BlockDeleteOnSource):
-        f_cli.delete_file(filename=filename, path=str(tmp_source))
+        f_cli.delete_file(filename=filename, path=path)
 
     assert os.path.isfile(file_path_source)
 
