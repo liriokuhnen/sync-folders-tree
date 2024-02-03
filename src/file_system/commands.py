@@ -7,11 +7,14 @@ import os
 import shutil
 
 from src.file_system.exceptions import (BlockCreateFolderOnSource,
+                                        BlockDeleteOfDestinationFolder,
                                         BlockDeleteOnSource,
                                         DestinationPathDoesNotExist,
-                                        ErrorOnDelete, FileNotFoundOnDelete,
+                                        ErrorOnDelete, ErrorOnDeleteFolder,
+                                        FileNotFoundOnDelete,
                                         FileOrDirectoryNotFound,
                                         FolderAlreadyExist,
+                                        FolderNotFoundOnDelete,
                                         SourcePathDoesNotExist)
 
 
@@ -95,6 +98,31 @@ class FileSystemCommands:
                 "Error on create folder %s - %s.", err.filename, err.strerror
             )
             raise FolderAlreadyExist from err
+
+
+    def delete_folder(self, folder: str) -> None:
+        """
+        Delete folder on destination
+
+        :raises:
+            FolderNotFoundOnDelete: when folder to delete is not found
+        """
+        folder_path = os.path.normpath(os.path.join(self._destination, folder))
+
+        # check if the folder_path is not the destination root
+        if len(folder_path) <= len(self._destination) + 1:
+            raise BlockDeleteOfDestinationFolder
+
+        if not os.path.isdir(folder_path):
+            raise FolderNotFoundOnDelete
+
+        try:
+            shutil.rmtree(folder_path)
+        except OSError as err:
+            logging.warning(
+                "Error on delete folder: %s - %s.", err.filename, err.strerror
+            )
+            raise ErrorOnDeleteFolder from err
 
 
     def _check_root_folders(self):

@@ -36,3 +36,15 @@ class FolderAlreadyExist(FileSystemBaseException):
 
 class BlockCreateFolderOnSource(FileSystemBaseException):
     """Raise when a creation folder is blocked on source"""
+
+
+class FolderNotFoundOnDelete(FileSystemBaseException):
+    """Raise when a folder is not found on delete"""
+
+
+class BlockDeleteOfDestinationFolder(FileSystemBaseException):
+    """Raise when a delete of root folder destination is blocked"""
+
+
+class ErrorOnDeleteFolder(FileSystemBaseException):
+    """Raise when a error happen on delete folder"""
