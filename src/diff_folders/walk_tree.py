@@ -5,9 +5,9 @@ differences from destination, with the control level of how deep will be the dif
 
 import os
 from dataclasses import dataclass
-from typing import Generator, List
+from typing import Generator, List, Optional
 
-from src.settings import FolderSettingsDataClass
+from src.settings import DiffActionsEnum, FolderSettingsDataClass
 
 
 @dataclass
@@ -35,7 +35,15 @@ class DiffResponse:
     destination: DestinationStructure
 
 
-class DiffTree:
+@dataclass
+class GetActionResponse:
+    """Data response with required action to keep destination synced"""
+    common_root: str
+    name: str
+    action: DiffActionsEnum
+
+
+class DiffTree:  # pylint: disable=too-few-public-methods
     """Scan folders tree to identify the differences and required sync actions"""
 
     def __init__(
@@ -44,13 +52,71 @@ class DiffTree:
         """Settings of source and destination"""
         self._folder_settings = folder_settings
 
+    def get_actions(self) -> Optional[Generator[GetActionResponse, None, None]]:
+        """
+        Method to get actions create, delete or update doing a diff between
+        source and destination.
+
+        comparing the filename combined with filesize plus last modified date, the
+        objective is identify if update action is required without opening and reading
+        all files
+        """
+        diff_scan = self._scan_tree_generator()
+
+        for diff in diff_scan:
+            files_create = diff.source.files - diff.destination.files
+            for file_create in files_create:
+                yield GetActionResponse(
+                   common_root=diff.common_root,
+                   name=file_create,
+                   action=DiffActionsEnum.CREATE_FILE,
+                )
+
+            files_delete = diff.destination.files - diff.source.files
+            for file_delete in files_delete:
+                yield GetActionResponse(
+                   common_root=diff.common_root,
+                   name=file_delete,
+                   action=DiffActionsEnum.DELETE_FILE,
+                )
+
+            files_check = diff.source.files - files_create
+            for file_check in files_check:
+                if self._compare_file_by_size_and_last_modified_date(
+                    common_root=diff.common_root, filename=file_check
+                ):
+                    yield GetActionResponse(
+                       common_root=diff.common_root,
+                       name=file_check,
+                       action=DiffActionsEnum.UPDATE_FILE,
+                    )
+
+            folders_create = diff.source.folders - diff.destination.folders
+            for folder_create in folders_create:
+                yield GetActionResponse(
+                   common_root=diff.common_root,
+                   name=folder_create,
+                   action=DiffActionsEnum.CREATE_FOLDER,
+                )
+
+            folders_delete = diff.destination.folders - diff.source.folders
+            for folder_delete in folders_delete:
+                yield GetActionResponse(
+                   common_root=diff.common_root,
+                   name=folder_delete,
+                   action=DiffActionsEnum.DELETE_FOLDER,
+                )
+
+
     def _scan_tree_generator(self) -> Generator[DiffResponse, None, None]:
         """Method that will get differences by file and folder name
         between source and destination, scanning all levels folders tree"""
 
         for src_root, src_folders, src_files in os.walk(self._folder_settings.source):
             common_root = self._get_common_root(src_root)
-            destination_path = os.path.join(self._folder_settings.destination, common_root)
+            destination_path = os.path.join(
+                self._folder_settings.destination, common_root
+            )
 
             destination_walk = os.walk(destination_path)
 
@@ -59,12 +125,37 @@ class DiffTree:
             except StopIteration:
                 dest_folders, dest_files = [], []
 
-            source = SourceStructure(folders=src_folders, files=src_files)
-            destination = DestinationStructure(folders=dest_folders, files=dest_files)
+            source = SourceStructure(folders=set(src_folders), files=set(src_files))
+            destination = DestinationStructure(
+                folders=set(dest_folders), files=set(dest_files)
+            )
 
             yield DiffResponse(
                 common_root=common_root, source=source, destination=destination
             )
+
+    def _compare_file_by_size_and_last_modified_date(
+        self, common_root: str, filename:str
+    ) -> bool:
+        """
+        This method will compare file from source and destination checking by filesize
+        and last modified date in order to evaluate if the file need to be updated
+
+        this check will avoid the need to open and read the file to confirm if the file
+        should be synced, which means less computer resource, but this check not 100%
+        precise once it will rely on OS file date updating which could be misupdated
+        """
+        source_file_path = os.path.join(
+            self._folder_settings.source, common_root, filename
+        )
+        destination_file_path = os.path.join(
+            self._folder_settings.destination, common_root, filename
+        )
+
+        src_st = os.stat(source_file_path)
+        dest_st = os.stat(destination_file_path)
+
+        return src_st.st_size != dest_st.st_size or src_st.st_mtime != dest_st.st_mtime
 
     def _get_common_root(self, root):
         """

@@ -38,25 +38,25 @@ def test_scan_tree_generator_with_files_only_on_source(tmp_source, tmp_destinati
     first_level = next(scan_diff_generator)
 
     assert first_level.common_root == ""
-    assert first_level.source.folders == [sub_folder_1]
-    assert first_level.destination.folders == []
+    assert first_level.source.folders == {sub_folder_1}
+    assert first_level.destination.folders == set()
     # check all files exist on source
     for file in LEVEL_1:
         assert file["name"] in first_level.source.files
     # check files does not exist on destination
-    assert first_level.destination.folders == []
-    assert first_level.destination.files == []
+    assert first_level.destination.folders == set()
+    assert first_level.destination.files == set()
 
     second_level = next(scan_diff_generator)
     
     assert second_level.common_root == sub_folder_1
-    assert second_level.source.folders == []
+    assert second_level.source.folders == set()
     # check all files exist on source
     for file in LEVEL_2:
         assert file["name"] in second_level.source.files
     # check files does not exist on destination
-    assert second_level.destination.folders == []
-    assert second_level.destination.files == []
+    assert second_level.destination.folders == set()
+    assert second_level.destination.files == set()
 
     with pytest.raises(StopIteration):
         next(scan_diff_generator)
@@ -87,8 +87,8 @@ def test_scan_tree_generator_with_files_on_source_and_destination(
     first_level = next(scan_diff_generator)
 
     assert first_level.common_root == ""
-    assert first_level.source.folders == [sub_folder_1]
-    assert first_level.destination.folders == [sub_folder_1]
+    assert first_level.source.folders == {sub_folder_1}
+    assert first_level.destination.folders == {sub_folder_1}
     # check all files exist on source and destination
     for file in LEVEL_1:
         assert file["name"] in first_level.source.files
@@ -97,8 +97,8 @@ def test_scan_tree_generator_with_files_on_source_and_destination(
     second_level = next(scan_diff_generator)
     
     assert second_level.common_root == sub_folder_1
-    assert second_level.source.folders == []
-    assert second_level.destination.folders == []
+    assert second_level.source.folders == set()
+    assert second_level.destination.folders == set()
     # check all files exist on source and destination
     for file in LEVEL_2:
         assert file["name"] in second_level.source.files
@@ -124,14 +124,14 @@ def test_scan_tree_generator_with_files_only_on_destination(
     first_level = next(scan_diff_generator)
 
     assert first_level.common_root == ""
-    assert first_level.source.folders == []
-    assert first_level.destination.folders == []
+    assert first_level.source.folders == set()
+    assert first_level.destination.folders == set()
     # check all files exist on destination
     for file in LEVEL_1:
         assert file["name"] in first_level.destination.files
     # check files does not exist on source
-    assert first_level.source.folders == []
-    assert first_level.source.files == []
+    assert first_level.source.folders == set()
+    assert first_level.source.files == set()
 
     with pytest.raises(StopIteration):
         next(scan_diff_generator)
@@ -148,10 +148,10 @@ def test_scan_tree_generator_without_any_file(tmp_source, tmp_destination):
     first_level = next(scan_diff_generator)
 
     assert first_level.common_root == ""
-    assert first_level.source.folders == []
-    assert first_level.source.files == []
-    assert first_level.destination.files == []
-    assert first_level.destination.files == []
+    assert first_level.source.folders == set()
+    assert first_level.source.files == set()
+    assert first_level.destination.files == set()
+    assert first_level.destination.files == set()
 
     with pytest.raises(StopIteration):
         next(scan_diff_generator)
