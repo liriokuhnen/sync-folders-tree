@@ -17,6 +17,7 @@ from src.file_system.exceptions import (BlockCreateFolderOnSource,
                                         FolderNotFoundOnDelete,
                                         SourceAndDestinationAreEquals,
                                         SourcePathDoesNotExist)
+from src.settings import FolderSettingsDataClass
 
 
 class FileSystemCommands:
@@ -24,7 +25,7 @@ class FileSystemCommands:
     Class to handle file system commands
     """
 
-    def __init__(self, source: str, destination: str) -> None:
+    def __init__(self, folder_settings: FolderSettingsDataClass) -> None:
         """
         Define source and destination root path
 
@@ -32,8 +33,8 @@ class FileSystemCommands:
             SourcePathDoesNotExist: if source does not exist.
             DestinationPathDoesNotExist: if destination does not exist.
         """
-        self._source = source
-        self._destination = destination
+        self._source = folder_settings.source
+        self._destination = folder_settings.destination
 
         self._check_root_folders()
 

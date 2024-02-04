@@ -9,13 +9,17 @@ from src.file_system.exceptions import (BlockDeleteOfDestinationFolder,
                                         ErrorOnDeleteFolder,
                                         FileNotFoundOnDelete,
                                         FolderNotFoundOnDelete)
+from src.settings import FolderSettingsDataClass
 from src.tests.conftest import create_tmp_file
 
 CONTENT = "File Content"
 
 
 def test_delete_folder_that_does_not_exist(tmp_source, tmp_destination):
-    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_destination))
+    folder_settings = FolderSettingsDataClass(
+        source=str(tmp_source), destination=str(tmp_destination)
+    )
+    f_cli = FileSystemCommands(folder_settings=folder_settings)
     folder = "not_exist"
     folder_path = os.path.join(str(tmp_destination), folder)
 
@@ -27,7 +31,10 @@ def test_delete_folder_that_does_not_exist(tmp_source, tmp_destination):
 
 @pytest.mark.parametrize("folder", ["folder_to_delete", ".hidden_folder", "a"])
 def test_delete_folder(tmp_source, tmp_destination, folder):
-    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_destination))
+    folder_settings = FolderSettingsDataClass(
+        source=str(tmp_source), destination=str(tmp_destination)
+    )
+    f_cli = FileSystemCommands(folder_settings=folder_settings)
     tmp_destination = tmp_destination / folder
     tmp_destination.mkdir()
 
@@ -41,7 +48,10 @@ def test_delete_folder(tmp_source, tmp_destination, folder):
 
 @pytest.mark.parametrize("folder", ["", "/", "//", ".", "./", "..", "../"])
 def test_try_delete_root_folder(tmp_source, tmp_destination, folder):
-    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_destination))
+    folder_settings = FolderSettingsDataClass(
+        source=str(tmp_source), destination=str(tmp_destination)
+    )
+    f_cli = FileSystemCommands(folder_settings=folder_settings)
 
     with pytest.raises(BlockDeleteOfDestinationFolder):
         f_cli.delete_folder(folder=folder)
@@ -52,7 +62,10 @@ def test_try_delete_root_folder(tmp_source, tmp_destination, folder):
 @patch("src.file_system.commands.shutil.rmtree")
 def test_generic_exception_on_delete_folder(mock_rmtree, tmp_source, tmp_destination):
     mock_rmtree.side_effect = IOError()
-    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_destination))
+    folder_settings = FolderSettingsDataClass(
+        source=str(tmp_source), destination=str(tmp_destination)
+    )
+    f_cli = FileSystemCommands(folder_settings=folder_settings)
     folder = "new_folder"
     tmp_destination = tmp_destination / folder
     tmp_destination.mkdir()
@@ -74,7 +87,10 @@ def test_delete_folder_with_files_inside(tmp_source, tmp_destination):
     assert os.path.isfile(file_destination)
     assert os.path.isdir(folder_destination)
 
-    f_cli = FileSystemCommands(source=str(tmp_source), destination=str(tmp_destination))
+    folder_settings = FolderSettingsDataClass(
+        source=str(tmp_source), destination=str(tmp_destination)
+    )
+    f_cli = FileSystemCommands(folder_settings=folder_settings)
     f_cli.delete_folder(folder=sub_folder)
 
     assert not os.path.isfile(file_destination)
