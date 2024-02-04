@@ -36,3 +36,9 @@ def create_tmp_file(tmp_folder, filename, content, sub_folders=None):
     file = tmp_folder / filename
     file.write_text(content)
     return file
+
+
+def create_tmp_folder(tmp_folder, new_folder):
+    tmp_folder = tmp_folder / new_folder
+    tmp_folder.mkdir()
+    return tmp_folder

@@ -6,7 +6,7 @@ import pytest
 from src.file_system.commands import FileSystemCommands
 from src.file_system.exceptions import (BlockDeleteOnSource, ErrorOnDelete,
                                         FileNotFoundOnDelete)
-from src.tests.unit.file_system.conftest import create_tmp_file
+from src.tests.conftest import create_tmp_file
 
 CONTENT = "File Content"
 
