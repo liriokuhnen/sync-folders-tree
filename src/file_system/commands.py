@@ -1,5 +1,5 @@
 """
-File system module to manage the files and directories of source and destination
+File system module to manage the files and folders of source and destination
 """
 
 import logging
@@ -39,7 +39,7 @@ class FileSystemCommands:
         self._check_root_folders()
 
 
-    def create_file(self, filename: str, path: str = "") -> None:
+    def create_file(self, path: str) -> None:
         """
         Create a specific file from source to destination, source file and destination
         directory must exist
@@ -47,7 +47,7 @@ class FileSystemCommands:
         :raises:
             FileOrDirectoryNotFound: if file or directory is not found.
         """
-        source_path = os.path.normpath(os.path.join(self._source, path, filename))
+        source_path = os.path.normpath(os.path.join(self._source, path))
         destination_path = os.path.normpath(os.path.join(self._destination, path))
 
         try:
@@ -57,7 +57,7 @@ class FileSystemCommands:
             raise FileOrDirectoryNotFound from err
 
 
-    def delete_file(self, filename: str, path: str = "") -> None:
+    def delete_file(self, path: str) -> None:
         """
         Delete a specific file on destination
 
@@ -67,7 +67,7 @@ class FileSystemCommands:
             ErrorOnDelete: when os error happen on delete file
         """
         destination_path = os.path.normpath(
-            os.path.join(self._destination, path, filename)
+            os.path.join(self._destination, path)
         )
 
         if not os.path.isfile(destination_path):
@@ -84,7 +84,7 @@ class FileSystemCommands:
             raise ErrorOnDelete from err
 
 
-    def create_folder(self, folder: str) -> None:
+    def create_folder(self, path: str) -> None:
         """
         Create folder on destination
 
@@ -92,7 +92,7 @@ class FileSystemCommands:
             ErrorOnCreateFolder: when a folder already exist or is not found.
             BlockCreateFolderOnSource: block create folder on source.
         """
-        folder_path = os.path.normpath(os.path.join(self._destination, folder))
+        folder_path = os.path.normpath(os.path.join(self._destination, path))
 
         # Security check to block create folder on source
         if folder_path.startswith(self._source):
@@ -107,7 +107,7 @@ class FileSystemCommands:
             raise ErrorOnCreateFolder from err
 
 
-    def delete_folder(self, folder: str) -> None:
+    def delete_folder(self, path: str) -> None:
         """
         Delete folder on destination
 
@@ -116,7 +116,7 @@ class FileSystemCommands:
             BlockDeleteOfDestinationFolder: block to prevent delete root destination
             ErrorOnDeleteFolder: when a os error happen in the delete
         """
-        folder_path = os.path.normpath(os.path.join(self._destination, folder))
+        folder_path = os.path.normpath(os.path.join(self._destination, path))
 
         # check if the folder_path is not the destination root
         if len(folder_path) <= len(self._destination) + 1:

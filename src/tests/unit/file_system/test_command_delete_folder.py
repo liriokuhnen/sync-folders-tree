@@ -24,7 +24,7 @@ def test_delete_folder_that_does_not_exist(tmp_source, tmp_destination):
     folder_path = os.path.join(str(tmp_destination), folder)
 
     with pytest.raises(FolderNotFoundOnDelete):
-        f_cli.delete_folder(folder=folder)
+        f_cli.delete_folder(path=folder)
 
     assert not os.path.isdir(folder_path)
 
@@ -40,7 +40,7 @@ def test_delete_folder(tmp_source, tmp_destination, folder):
 
     assert os.path.isdir(str(tmp_destination))
 
-    f_cli.delete_folder(folder=folder)
+    f_cli.delete_folder(path=folder)
 
     assert not os.path.isdir(str(tmp_destination))
 
@@ -54,7 +54,7 @@ def test_try_delete_root_folder(tmp_source, tmp_destination, folder):
     f_cli = FileSystemCommands(folder_settings=folder_settings)
 
     with pytest.raises(BlockDeleteOfDestinationFolder):
-        f_cli.delete_folder(folder=folder)
+        f_cli.delete_folder(path=folder)
     
     assert os.path.isdir(str(tmp_destination))
 
@@ -71,7 +71,7 @@ def test_generic_exception_on_delete_folder(mock_rmtree, tmp_source, tmp_destina
     tmp_destination.mkdir()
 
     with pytest.raises(ErrorOnDeleteFolder):
-        f_cli.delete_folder(folder=folder)
+        f_cli.delete_folder(path=folder)
 
     assert os.path.isdir(str(tmp_destination))
 
@@ -91,7 +91,7 @@ def test_delete_folder_with_files_inside(tmp_source, tmp_destination):
         source=str(tmp_source), destination=str(tmp_destination)
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
-    f_cli.delete_folder(folder=sub_folder)
+    f_cli.delete_folder(path=sub_folder)
 
     assert not os.path.isfile(file_destination)
     assert not os.path.isdir(folder_destination)

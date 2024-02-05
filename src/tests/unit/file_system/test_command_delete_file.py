@@ -19,7 +19,7 @@ def test_delete_file_that_does_not_exist(tmp_source, tmp_destination, file):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(FileNotFoundOnDelete):
-        f_cli.delete_file(filename=file)
+        f_cli.delete_file(path=file)
 
 
 def test_not_allow_delete_folder_instead_file(tmp_source, tmp_destination):
@@ -29,7 +29,7 @@ def test_not_allow_delete_folder_instead_file(tmp_source, tmp_destination):
     f_cli = FileSystemCommands(folder_settings=folder_settings)
 
     with pytest.raises(FileNotFoundOnDelete):
-        f_cli.delete_file(filename=str(tmp_destination))
+        f_cli.delete_file(path=str(tmp_destination))
 
     assert os.path.isdir(str(tmp_destination))
 
@@ -46,7 +46,7 @@ def test_delete_file_from_destination(tmp_source, tmp_destination):
         source=str(tmp_source), destination=str(tmp_destination)
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
-    f_cli.delete_file(filename=filename, path=str(tmp_destination))
+    f_cli.delete_file(path=filename)
 
     assert not os.path.isfile(file_path_destination)
 
@@ -54,6 +54,7 @@ def test_delete_file_from_destination(tmp_source, tmp_destination):
 def test_not_allow_delete_file_from_source(tmp_source, tmp_destination):
     path = "../source/"
     filename = "filename.txt"
+    file_path = os.path.join(path, filename)
     file_path_source = os.path.join(str(tmp_source), filename)
 
     create_tmp_file(tmp_source, filename, CONTENT)
@@ -65,7 +66,7 @@ def test_not_allow_delete_file_from_source(tmp_source, tmp_destination):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(BlockDeleteOnSource):
-        f_cli.delete_file(filename=filename, path=path)
+        f_cli.delete_file(path=file_path)
 
     assert os.path.isfile(file_path_source)
 
@@ -83,6 +84,6 @@ def test_generic_exception_on_delete(mock_remove, tmp_source, tmp_destination):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(ErrorOnDelete):
-        f_cli.delete_file(filename=filename, path=str(tmp_destination))
+        f_cli.delete_file(path=filename)
 
     assert os.path.isfile(file_path_destination)

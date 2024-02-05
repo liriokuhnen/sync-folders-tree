@@ -19,7 +19,7 @@ def test_create_folder(tmp_source, tmp_destination):
         source=str(tmp_source), destination=str(tmp_destination)
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
-    f_cli.create_folder(folder=folder)
+    f_cli.create_folder(path=folder)
 
     assert os.path.isdir(folder_path)
 
@@ -32,7 +32,7 @@ def test_create_folder_that_already_exist(tmp_source, tmp_destination):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(ErrorOnCreateFolder):
-        f_cli.create_folder(folder=str(tmp_destination))
+        f_cli.create_folder(path=str(tmp_destination))
 
 
 def test_error_on_create_two_sub_folder_at_once(tmp_source, tmp_destination):
@@ -44,7 +44,7 @@ def test_error_on_create_two_sub_folder_at_once(tmp_source, tmp_destination):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(ErrorOnCreateFolder):
-        f_cli.create_folder(folder=folder)
+        f_cli.create_folder(path=folder)
 
     assert not os.path.isdir(folder_path)
 
@@ -60,7 +60,7 @@ def test_error_on_create_folder_that_already_exist_as_file(tmp_source, tmp_desti
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(ErrorOnCreateFolder):
-        f_cli.create_folder(folder=filename)
+        f_cli.create_folder(path=filename)
 
     assert os.path.isfile(file_path_destination)
 
@@ -74,6 +74,6 @@ def test_error_on_create_a_folder_on_source(tmp_source, tmp_destination):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(BlockCreateFolderOnSource):
-        f_cli.create_folder(folder=folder)
+        f_cli.create_folder(path=folder)
 
     assert not os.path.isdir(folder_path)

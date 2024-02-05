@@ -16,7 +16,7 @@ def test_create_file_that_does_not_exist(tmp_source, tmp_destination):
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(FileOrDirectoryNotFound):
-        f_cli.create_file(filename="does_not_exist_file.txt")
+        f_cli.create_file(path="does_not_exist_file.txt")
 
 
 def test_create_file_on_destination(tmp_source, tmp_destination):
@@ -33,7 +33,7 @@ def test_create_file_on_destination(tmp_source, tmp_destination):
         source=str(tmp_source), destination=str(tmp_destination)
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
-    f_cli.create_file(filename=filename)
+    f_cli.create_file(path=filename)
 
     with open(file_path_destination, "r") as destination_file:
         destination_file_content = destination_file.read()
@@ -48,6 +48,7 @@ def test_create_file_with_sub_folders_on_destination_that_does_not_exist(
 ):
     filename = "filename.txt"
     sub_folders = "sub_folder1/sub_folder2"
+    filename_path = os.path.join(sub_folders, filename)
     file_path_source = os.path.join(str(tmp_source), sub_folders, filename)
     file_path_destination = os.path.join(str(tmp_destination), sub_folders, filename)
 
@@ -61,4 +62,4 @@ def test_create_file_with_sub_folders_on_destination_that_does_not_exist(
     )
     f_cli = FileSystemCommands(folder_settings=folder_settings)
     with pytest.raises(FileOrDirectoryNotFound):
-        f_cli.create_file(filename=filename, path=sub_folders)
+        f_cli.create_file(path=filename_path)

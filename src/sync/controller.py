@@ -21,8 +21,12 @@ class SyncController:  #pylint: disable=too-few-public-methods
         """
         self._diff_client = DiffTree(folder_settings=folder_settings)
         self._commands_client = FileSystemCommands(folder_settings=folder_settings)
-        self._sync_actions = {
+        self._map_actions = {
             DiffActionsEnum.CREATE_FILE: self._commands_client.create_file,
+            DiffActionsEnum.UPDATE_FILE: self._commands_client.create_file,
+            DiffActionsEnum.DELETE_FILE: self._commands_client.delete_file,
+            DiffActionsEnum.CREATE_FOLDER: self._commands_client.create_folder,
+            DiffActionsEnum.DELETE_FOLDER: self._commands_client.delete_folder,
         }
 
     @memory_usage
@@ -31,13 +35,7 @@ class SyncController:  #pylint: disable=too-few-public-methods
         """Start diff scan in source to execute sync actions into destination"""
 
         for diff in self._diff_client.get_actions():
-            if diff.action in [DiffActionsEnum.CREATE_FILE, DiffActionsEnum.UPDATE_FILE]:
-                self._commands_client.create_file(filename=diff.name, path=diff.common_root)
-            elif diff.action == DiffActionsEnum.DELETE_FILE:
-                self._commands_client.delete_file(filename=diff.name, path=diff.common_root)
-            elif diff.action == DiffActionsEnum.CREATE_FOLDER:
-                path = os.path.join(diff.common_root, diff.name)
-                self._commands_client.create_folder(folder=path)
-            elif diff.action == DiffActionsEnum.DELETE_FOLDER:
-                path = os.path.join(diff.common_root, diff.name)
-                self._commands_client.delete_folder(folder=path)
+            callable_action = self._map_actions.get(diff.action)
+
+            if callable_action:
+                callable_action(path=os.path.join(diff.common_root, diff.name))
