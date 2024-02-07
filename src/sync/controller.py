@@ -3,6 +3,7 @@ Module that will control sync actions interacting with DiffTree and FileSystemCo
 """
 
 import os
+from logging import Logger
 
 from diff_folders.walk_tree import DiffTree
 from file_system.commands import FileSystemCommands
@@ -14,13 +15,18 @@ from utils.timeit import timeit
 class SyncController:  #pylint: disable=too-few-public-methods
     """Class to execute sync operations between source and destination"""
 
-    def __init__(self, folder_settings: FolderSettingsDataClass) -> None:
+    def __init__(
+        self, folder_settings: FolderSettingsDataClass, logger: Logger
+    ) -> None:
         """
         Initialize DiffTree and FileSystemCommands modules with source and destination
         settings
         """
         self._diff_client = DiffTree(folder_settings=folder_settings)
-        self._commands_client = FileSystemCommands(folder_settings=folder_settings)
+        self._commands_client = FileSystemCommands(
+            folder_settings=folder_settings, logger=logger
+        )
+        self._logger = logger
         self._map_actions = {
             DiffActionsEnum.CREATE_FILE: self._commands_client.create_file,
             DiffActionsEnum.UPDATE_FILE: self._commands_client.create_file,
@@ -39,3 +45,4 @@ class SyncController:  #pylint: disable=too-few-public-methods
 
             if callable_action:
                 callable_action(path=os.path.join(diff.common_root, diff.name))
+                self._logger.info(f"sync action {diff.action.value} complete")

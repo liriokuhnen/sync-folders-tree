@@ -2,21 +2,20 @@
 File system module to manage the files and folders of source and destination
 """
 
-import logging
 import os
 import shutil
+from logging import Logger
 
 from file_system.exceptions import (BlockCreateFolderOnSource,
-                                        BlockDeleteOfDestinationFolder,
-                                        BlockDeleteOnSource,
-                                        DestinationPathDoesNotExist,
-                                        ErrorOnCreateFolder, ErrorOnDelete,
-                                        ErrorOnDeleteFolder,
-                                        FileNotFoundOnDelete,
-                                        FileOrDirectoryNotFound,
-                                        FolderNotFoundOnDelete,
-                                        SourceAndDestinationAreEquals,
-                                        SourcePathDoesNotExist)
+                                    BlockDeleteOfDestinationFolder,
+                                    BlockDeleteOnSource,
+                                    DestinationPathDoesNotExist,
+                                    ErrorOnCreateFolder, ErrorOnDelete,
+                                    ErrorOnDeleteFolder, FileNotFoundOnDelete,
+                                    FileOrDirectoryNotFound,
+                                    FolderNotFoundOnDelete,
+                                    SourceAndDestinationAreEquals,
+                                    SourcePathDoesNotExist)
 from settings import FolderSettingsDataClass
 
 
@@ -25,9 +24,11 @@ class FileSystemCommands:
     Class to handle file system commands
     """
 
-    def __init__(self, folder_settings: FolderSettingsDataClass) -> None:
+    def __init__(
+        self, folder_settings: FolderSettingsDataClass, logger: Logger
+    ) -> None:
         """
-        Define source and destination root path
+        Define source and destination root path and logger
 
         :raises:
             SourcePathDoesNotExist: if source does not exist.
@@ -35,6 +36,7 @@ class FileSystemCommands:
         """
         self._source = folder_settings.source
         self._destination = folder_settings.destination
+        self._logger = logger
 
         self._check_root_folders()
 
@@ -53,7 +55,7 @@ class FileSystemCommands:
         try:
             shutil.copy2(source_path, destination_path)
         except FileNotFoundError as err:
-            logging.warning("Error on copy file: %s - %s", err.filename, err.strerror)
+            self._logger.warning("Error on copy file: %s - %s", err.filename, err.strerror)
             raise FileOrDirectoryNotFound from err
 
 
@@ -80,7 +82,7 @@ class FileSystemCommands:
         try:
             os.remove(destination_path)
         except OSError as err:
-            logging.warning("Error on delete: %s - %s.", err.filename, err.strerror)
+            self._logger.warning("Error on delete: %s - %s.", err.filename, err.strerror)
             raise ErrorOnDelete from err
 
 
@@ -101,7 +103,7 @@ class FileSystemCommands:
         try:
             os.mkdir(folder_path)
         except (FileExistsError, FileNotFoundError) as err:
-            logging.warning(
+            self._logger.warning(
                 "Error on create folder %s - %s.", err.filename, err.strerror
             )
             raise ErrorOnCreateFolder from err
@@ -128,7 +130,7 @@ class FileSystemCommands:
         try:
             shutil.rmtree(folder_path)
         except OSError as err:
-            logging.warning(
+            self._logger.warning(
                 "Error on delete folder: %s - %s.", err.filename, err.strerror
             )
             raise ErrorOnDeleteFolder from err

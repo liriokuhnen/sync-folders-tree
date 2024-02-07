@@ -1,12 +1,15 @@
+import logging
 import os
 
 import pytest
 
 from file_system.commands import FileSystemCommands
 from file_system.exceptions import (BlockCreateFolderOnSource,
-                                        ErrorOnCreateFolder)
+                                    ErrorOnCreateFolder)
 from settings import FolderSettingsDataClass
 from tests.conftest import create_tmp_file
+
+logger = logging.getLogger()
 
 
 def test_create_folder(tmp_source, tmp_destination):
@@ -18,7 +21,7 @@ def test_create_folder(tmp_source, tmp_destination):
     folder_settings = FolderSettingsDataClass(
         source=str(tmp_source), destination=str(tmp_destination)
     )
-    f_cli = FileSystemCommands(folder_settings=folder_settings)
+    f_cli = FileSystemCommands(folder_settings=folder_settings, logger=logger)
     f_cli.create_folder(path=folder)
 
     assert os.path.isdir(folder_path)
@@ -30,7 +33,7 @@ def test_create_folder_that_already_exist(tmp_source, tmp_destination):
     folder_settings = FolderSettingsDataClass(
         source=str(tmp_source), destination=str(tmp_destination)
     )
-    f_cli = FileSystemCommands(folder_settings=folder_settings)
+    f_cli = FileSystemCommands(folder_settings=folder_settings, logger=logger)
     with pytest.raises(ErrorOnCreateFolder):
         f_cli.create_folder(path=str(tmp_destination))
 
@@ -42,7 +45,7 @@ def test_error_on_create_two_sub_folder_at_once(tmp_source, tmp_destination):
     folder_settings = FolderSettingsDataClass(
         source=str(tmp_source), destination=str(tmp_destination)
     )
-    f_cli = FileSystemCommands(folder_settings=folder_settings)
+    f_cli = FileSystemCommands(folder_settings=folder_settings, logger=logger)
     with pytest.raises(ErrorOnCreateFolder):
         f_cli.create_folder(path=folder)
 
@@ -58,7 +61,7 @@ def test_error_on_create_folder_that_already_exist_as_file(tmp_source, tmp_desti
     folder_settings = FolderSettingsDataClass(
         source=str(tmp_source), destination=str(tmp_destination)
     )
-    f_cli = FileSystemCommands(folder_settings=folder_settings)
+    f_cli = FileSystemCommands(folder_settings=folder_settings, logger=logger)
     with pytest.raises(ErrorOnCreateFolder):
         f_cli.create_folder(path=filename)
 
@@ -72,7 +75,7 @@ def test_error_on_create_a_folder_on_source(tmp_source, tmp_destination):
     folder_settings = FolderSettingsDataClass(
         source=str(tmp_source), destination=str(tmp_destination)
     )
-    f_cli = FileSystemCommands(folder_settings=folder_settings)
+    f_cli = FileSystemCommands(folder_settings=folder_settings, logger=logger)
     with pytest.raises(BlockCreateFolderOnSource):
         f_cli.create_folder(path=folder)
 
