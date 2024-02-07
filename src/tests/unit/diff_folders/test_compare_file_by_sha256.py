@@ -25,7 +25,7 @@ def test_compare_same_file(tmp_source, tmp_destination):
     )
     diff_tree = DiffTree(folder_settings=folder_settings)
 
-    assert diff_tree._diff_file_sha256(common_root="", filename=filename)
+    assert not diff_tree._is_diff_sha256(common_root="", filename=filename)
 
 
 def test_compare_different_files(tmp_source, tmp_destination):
@@ -41,7 +41,7 @@ def test_compare_different_files(tmp_source, tmp_destination):
     )
     diff_tree = DiffTree(folder_settings=folder_settings)
 
-    assert not diff_tree._diff_file_sha256(common_root="", filename=filename)
+    assert diff_tree._is_diff_sha256(common_root="", filename=filename)
 
 
 def test_compare_almost_the_same_with_last_letter_different(
@@ -59,7 +59,7 @@ def test_compare_almost_the_same_with_last_letter_different(
     )
     diff_tree = DiffTree(folder_settings=folder_settings)
 
-    assert not diff_tree._diff_file_sha256(common_root="", filename=filename)
+    assert diff_tree._is_diff_sha256(common_root="", filename=filename)
 
 
 def test_compare_almost_the_same_with_first_letter_different(
@@ -77,7 +77,7 @@ def test_compare_almost_the_same_with_first_letter_different(
     )
     diff_tree = DiffTree(folder_settings=folder_settings)
 
-    assert not diff_tree._diff_file_sha256(common_root="", filename=filename)
+    assert diff_tree._is_diff_sha256(common_root="", filename=filename)
 
 
 def test_compare_empty_files(tmp_source, tmp_destination):
@@ -91,4 +91,4 @@ def test_compare_empty_files(tmp_source, tmp_destination):
     )
     diff_tree = DiffTree(folder_settings=folder_settings)
 
-    assert diff_tree._diff_file_sha256(common_root="", filename=filename)
+    assert not diff_tree._is_diff_sha256(common_root="", filename=filename)

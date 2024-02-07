@@ -55,7 +55,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
         (sha256 or file size + last modified date)
         """
         self._folder_settings = folder_settings
-        self._compare_file = self._diff_file_sha256 if sha256 else self._diff_size_mtime
+        self._must_update = self._is_diff_sha256 if sha256 else self._is_diff_size_mtime
 
     def get_actions(self) -> Optional[Generator[GetActionResponse, None, None]]:
         """
@@ -87,7 +87,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
 
             files_check = diff.source.files - files_create
             for file_check in files_check:
-                if self._compare_file(
+                if self._must_update(
                     common_root=diff.common_root, filename=file_check
                 ):
                     yield GetActionResponse(
@@ -139,7 +139,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
                 common_root=common_root, source=source, destination=destination
             )
 
-    def _diff_size_mtime(self, common_root: str, filename:str) -> bool:
+    def _is_diff_size_mtime(self, common_root: str, filename:str) -> bool:
         """
         This method will compare file from source and destination checking by filesize
         and last modified date in order to evaluate if the file need to be updated
@@ -147,6 +147,8 @@ class DiffTree:  # pylint: disable=too-few-public-methods
         this check will avoid the need to open and read the file to confirm if the file
         should be synced, which means less computer resource, but this check not 100%
         precise once it will rely on OS file date updating which could be misupdated
+
+        return: True if the file should be update and false if the file is synced
         """
         source_file_path = os.path.join(
             self._folder_settings.source, common_root, filename
@@ -161,10 +163,12 @@ class DiffTree:  # pylint: disable=too-few-public-methods
         return src_st.st_size != dest_st.st_size or src_st.st_mtime != dest_st.st_mtime
 
 
-    def _diff_file_sha256(self, common_root: str, filename:str) -> bool:
+    def _is_diff_sha256(self, common_root: str, filename:str) -> bool:
         """
         This method will compare both files reading all content and generating
         his sha256 in order to check if the file have the same content
+
+        return: True if the file should be update and false if the file is synced
         """
 
         def file_hash(file):
@@ -187,7 +191,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
             self._folder_settings.destination, common_root, filename
         )
 
-        return file_hash(source_file_path) == file_hash(destination_file_path)
+        return file_hash(source_file_path) != file_hash(destination_file_path)
 
 
     def _get_common_root(self, root):

@@ -20,7 +20,9 @@ def main(args):
     settings = FolderSettingsDataClass(source=args.source, destination=args.destination)
     logger = setup_logger("sync_logger", args.log)
 
-    sync_controller = SyncController(folder_settings=settings, logger=logger)
+    sync_controller = SyncController(
+        folder_settings=settings, logger=logger, sha256=args.sha256
+    )
 
     while True:
         try:
@@ -41,9 +43,9 @@ if __name__ == "__main__":
     parser.add_argument("interval", help="Required interval of sync in seconds", type=int)
     parser.add_argument("log", help="Required file log path", type=str)
 
-    # Optional argument TODO: implement optional diff of file with md5hash checksum
-    parser.add_argument("-m", "--md5hash", action="store_true", default=False,
-        help="diff files line by line using checksum md5hash strategy")
+    # Optional argument
+    parser.add_argument("-s", "--sha256", action="store_true", default=False,
+        help="diff files line by line using sha256 hash strategy")
 
     parser.add_argument(
         "--version",
