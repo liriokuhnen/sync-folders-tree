@@ -19,3 +19,7 @@ class DiffActionsEnum(Enum):
     DELETE_FILE = "delete_file"
     CREATE_FOLDER = "create_folder"
     DELETE_FOLDER = "delete_folder"
+
+
+# settings of sha256 diff
+BUF_SIZE = 1024 * 64

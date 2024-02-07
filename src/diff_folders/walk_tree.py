@@ -3,11 +3,12 @@ This module will walk through a source folder tree in order to get the
 differences from destination, with the control level of how deep will be the diff
 """
 
+import hashlib
 import os
 from dataclasses import dataclass
 from typing import Generator, List, Optional
 
-from settings import DiffActionsEnum, FolderSettingsDataClass
+from settings import BUF_SIZE, DiffActionsEnum, FolderSettingsDataClass
 
 
 @dataclass
@@ -47,10 +48,14 @@ class DiffTree:  # pylint: disable=too-few-public-methods
     """Scan folders tree to identify the differences and required sync actions"""
 
     def __init__(
-        self, folder_settings: FolderSettingsDataClass
+        self, folder_settings: FolderSettingsDataClass, sha256: bool = False
     ) -> None:
-        """Settings of source and destination"""
+        """
+        Settings of source and destination and strategy of diff files
+        (sha256 or file size + last modified date)
+        """
         self._folder_settings = folder_settings
+        self._compare_file = self._diff_file_sha256 if sha256 else self._diff_size_mtime
 
     def get_actions(self) -> Optional[Generator[GetActionResponse, None, None]]:
         """
@@ -82,7 +87,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
 
             files_check = diff.source.files - files_create
             for file_check in files_check:
-                if self._compare_file_by_size_and_last_modified_date(
+                if self._compare_file(
                     common_root=diff.common_root, filename=file_check
                 ):
                     yield GetActionResponse(
@@ -134,9 +139,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
                 common_root=common_root, source=source, destination=destination
             )
 
-    def _compare_file_by_size_and_last_modified_date(
-        self, common_root: str, filename:str
-    ) -> bool:
+    def _diff_size_mtime(self, common_root: str, filename:str) -> bool:
         """
         This method will compare file from source and destination checking by filesize
         and last modified date in order to evaluate if the file need to be updated
@@ -156,6 +159,36 @@ class DiffTree:  # pylint: disable=too-few-public-methods
         dest_st = os.stat(destination_file_path)
 
         return src_st.st_size != dest_st.st_size or src_st.st_mtime != dest_st.st_mtime
+
+
+    def _diff_file_sha256(self, common_root: str, filename:str) -> bool:
+        """
+        This method will compare both files reading all content and generating
+        his sha256 in order to check if the file have the same content
+        """
+
+        def file_hash(file):
+            sha256 = hashlib.sha256()
+            with open(file, 'rb') as f:
+                while True:
+                    data = f.read(BUF_SIZE)
+
+                    if not data:
+                        break
+
+                    sha256.update(data)
+
+            return sha256.hexdigest()
+
+        source_file_path = os.path.join(
+            self._folder_settings.source, common_root, filename
+        )
+        destination_file_path = os.path.join(
+            self._folder_settings.destination, common_root, filename
+        )
+
+        return file_hash(source_file_path) == file_hash(destination_file_path)
+
 
     def _get_common_root(self, root):
         """
