@@ -3,14 +3,14 @@ from unittest.mock import patch
 
 import pytest
 
-from src.file_system.commands import FileSystemCommands
-from src.file_system.exceptions import (BlockDeleteOfDestinationFolder,
+from file_system.commands import FileSystemCommands
+from file_system.exceptions import (BlockDeleteOfDestinationFolder,
                                         BlockDeleteOnSource, ErrorOnDelete,
                                         ErrorOnDeleteFolder,
                                         FileNotFoundOnDelete,
                                         FolderNotFoundOnDelete)
-from src.settings import FolderSettingsDataClass
-from src.tests.conftest import create_tmp_file
+from settings import FolderSettingsDataClass
+from tests.conftest import create_tmp_file
 
 CONTENT = "File Content"
 
@@ -59,7 +59,7 @@ def test_try_delete_root_folder(tmp_source, tmp_destination, folder):
     assert os.path.isdir(str(tmp_destination))
 
 
-@patch("src.file_system.commands.shutil.rmtree")
+@patch("file_system.commands.shutil.rmtree")
 def test_generic_exception_on_delete_folder(mock_rmtree, tmp_source, tmp_destination):
     mock_rmtree.side_effect = IOError()
     folder_settings = FolderSettingsDataClass(

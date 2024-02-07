@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-from src.diff_folders.walk_tree import DiffTree
-from src.settings import DiffActionsEnum, FolderSettingsDataClass
-from src.tests.conftest import create_tmp_file, create_tmp_folder
+from diff_folders.walk_tree import DiffTree
+from settings import DiffActionsEnum, FolderSettingsDataClass
+from tests.conftest import create_tmp_file, create_tmp_folder
 
 LEVEL_1  = [
     {"name": "file1.txt", "content": "content file 1"},

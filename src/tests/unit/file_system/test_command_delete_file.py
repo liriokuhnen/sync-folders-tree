@@ -3,11 +3,11 @@ from unittest.mock import patch
 
 import pytest
 
-from src.file_system.commands import FileSystemCommands
-from src.file_system.exceptions import (BlockDeleteOnSource, ErrorOnDelete,
+from file_system.commands import FileSystemCommands
+from file_system.exceptions import (BlockDeleteOnSource, ErrorOnDelete,
                                         FileNotFoundOnDelete)
-from src.settings import FolderSettingsDataClass
-from src.tests.conftest import create_tmp_file
+from settings import FolderSettingsDataClass
+from tests.conftest import create_tmp_file
 
 CONTENT = "File Content"
 
@@ -71,7 +71,7 @@ def test_not_allow_delete_file_from_source(tmp_source, tmp_destination):
     assert os.path.isfile(file_path_source)
 
 
-@patch("src.file_system.commands.os.remove")
+@patch("file_system.commands.os.remove")
 def test_generic_exception_on_delete(mock_remove, tmp_source, tmp_destination):
     filename = "filename.txt"
     file_path_destination = os.path.join(str(tmp_destination), filename)

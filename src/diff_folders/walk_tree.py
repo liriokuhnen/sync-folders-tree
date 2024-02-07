@@ -7,7 +7,7 @@ import os
 from dataclasses import dataclass
 from typing import Generator, List, Optional
 
-from src.settings import DiffActionsEnum, FolderSettingsDataClass
+from settings import DiffActionsEnum, FolderSettingsDataClass
 
 
 @dataclass

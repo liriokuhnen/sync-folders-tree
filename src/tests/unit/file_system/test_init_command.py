@@ -1,10 +1,10 @@
 import pytest
 
-from src.file_system.commands import FileSystemCommands
-from src.file_system.exceptions import (DestinationPathDoesNotExist,
+from file_system.commands import FileSystemCommands
+from file_system.exceptions import (DestinationPathDoesNotExist,
                                         SourceAndDestinationAreEquals,
                                         SourcePathDoesNotExist)
-from src.settings import FolderSettingsDataClass
+from settings import FolderSettingsDataClass
 
 
 def test_create_file_with_source_that_does_not_exist(tmp_destination):

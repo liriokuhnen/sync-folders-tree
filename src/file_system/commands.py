@@ -6,7 +6,7 @@ import logging
 import os
 import shutil
 
-from src.file_system.exceptions import (BlockCreateFolderOnSource,
+from file_system.exceptions import (BlockCreateFolderOnSource,
                                         BlockDeleteOfDestinationFolder,
                                         BlockDeleteOnSource,
                                         DestinationPathDoesNotExist,
@@ -17,7 +17,7 @@ from src.file_system.exceptions import (BlockCreateFolderOnSource,
                                         FolderNotFoundOnDelete,
                                         SourceAndDestinationAreEquals,
                                         SourcePathDoesNotExist)
-from src.settings import FolderSettingsDataClass
+from settings import FolderSettingsDataClass
 
 
 class FileSystemCommands:

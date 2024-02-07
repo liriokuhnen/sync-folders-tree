@@ -2,10 +2,10 @@ import os
 
 import pytest
 
-from src.file_system.commands import FileSystemCommands
-from src.file_system.exceptions import FileOrDirectoryNotFound
-from src.settings import FolderSettingsDataClass
-from src.tests.conftest import create_tmp_file
+from file_system.commands import FileSystemCommands
+from file_system.exceptions import FileOrDirectoryNotFound
+from settings import FolderSettingsDataClass
+from tests.conftest import create_tmp_file
 
 CONTENT = "File Content"
 

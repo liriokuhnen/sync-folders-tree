@@ -4,11 +4,11 @@ Module that will control sync actions interacting with DiffTree and FileSystemCo
 
 import os
 
-from src.diff_folders.walk_tree import DiffTree
-from src.file_system.commands import FileSystemCommands
-from src.settings import DiffActionsEnum, FolderSettingsDataClass
-from src.utils.memory_usage import memory_usage
-from src.utils.timeit import timeit
+from diff_folders.walk_tree import DiffTree
+from file_system.commands import FileSystemCommands
+from settings import DiffActionsEnum, FolderSettingsDataClass
+from utils.memory_usage import memory_usage
+from utils.timeit import timeit
 
 
 class SyncController:  #pylint: disable=too-few-public-methods

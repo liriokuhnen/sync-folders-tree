@@ -3,6 +3,8 @@
 import os
 from functools import wraps
 
+import humanize
+
 import psutil
 
 
@@ -14,7 +16,7 @@ def memory_usage(func):
         mem_start = process.memory_info()[0]
         result = func(*args, **kwargs)
         mem_end = process.memory_info()[0]
-        diff_kb = (mem_end - mem_start) // 1000
-        print(f"memory usage of {func.__name__}: {diff_kb} KB")
+        natural_size = humanize.naturalsize(mem_end - mem_start)
+        print(f"memory usage of {func.__name__}: {natural_size}")
         return result
     return memory_usage_wrapper
