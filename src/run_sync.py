@@ -21,7 +21,10 @@ def main(args):
     logger = setup_logger("sync_logger", args.log)
 
     sync_controller = SyncController(
-        folder_settings=settings, logger=logger, sha256=args.sha256
+        folder_settings=settings,
+        logger=logger,
+        sha256=args.sha256,
+        symlink=args.symlink,
     )
 
     while True:
@@ -46,6 +49,9 @@ if __name__ == "__main__":
     # Optional argument
     parser.add_argument("-s", "--sha256", action="store_true", default=False,
         help="diff files using sha256 hash strategy")
+    # Optional argument
+    parser.add_argument("-l", "--symlink", action="store_true", default=False,
+        help="follow symlink, be aware it could lead to infinite loop recursion")
 
     parser.add_argument(
         "--version",

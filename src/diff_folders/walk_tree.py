@@ -48,7 +48,10 @@ class DiffTree:  # pylint: disable=too-few-public-methods
     """Scan folders tree to identify the differences and required sync actions"""
 
     def __init__(
-        self, folder_settings: FolderSettingsDataClass, sha256: bool = False
+        self,
+        folder_settings: FolderSettingsDataClass,
+        sha256: bool = False,
+        symlink: bool = False,
     ) -> None:
         """
         Settings of source and destination and strategy of diff files
@@ -56,6 +59,7 @@ class DiffTree:  # pylint: disable=too-few-public-methods
         """
         self._folder_settings = folder_settings
         self._must_update = self._is_diff_sha256 if sha256 else self._is_diff_size_mtime
+        self._symlink = symlink
 
     def get_actions(self) -> Optional[Generator[GetActionResponse, None, None]]:
         """
@@ -117,7 +121,9 @@ class DiffTree:  # pylint: disable=too-few-public-methods
         """Method that will get differences by file and folder name
         between source and destination, scanning all levels folders tree"""
 
-        for src_root, src_folders, src_files in os.walk(self._folder_settings.source):
+        for src_root, src_folders, src_files in os.walk(
+            self._folder_settings.source, followlinks=self._symlink
+        ):
             common_root = self._get_common_root(src_root)
             destination_path = os.path.join(
                 self._folder_settings.destination, common_root

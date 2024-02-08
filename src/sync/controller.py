@@ -20,12 +20,15 @@ class SyncController:  #pylint: disable=too-few-public-methods
         folder_settings: FolderSettingsDataClass,
         logger: Logger,
         sha256: bool = False,
+        symlink: bool = False
     ) -> None:
         """
         Initialize DiffTree and FileSystemCommands modules with source and destination
         settings
         """
-        self._diff_client = DiffTree(folder_settings=folder_settings, sha256=sha256)
+        self._diff_client = DiffTree(
+            folder_settings=folder_settings, sha256=sha256, symlink=symlink
+        )
         self._commands_client = FileSystemCommands(
             folder_settings=folder_settings, logger=logger
         )
