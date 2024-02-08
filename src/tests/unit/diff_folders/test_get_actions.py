@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import pytest
 
@@ -131,7 +132,9 @@ def test_get_actions_update_when_file_exist_in_both_but_is_not_the_same(
 def test_get_any_actions_when_both_folders_is_synced(tmp_source, tmp_destination):
     for file_create in LEVEL_1:
         create_tmp_file(tmp_source, file_create["name"], file_create["content"])
-        create_tmp_file(tmp_destination, file_create["name"], file_create["content"])
+        src_file = os.path.join(str(tmp_source), file_create["name"])
+        dest_file = os.path.join(str(tmp_destination), file_create["name"])
+        shutil.copy2(src_file, dest_file)
 
     sub_folder_1 = "subfolder_1"
     src_tmp_sub_folder = create_tmp_folder(tmp_source, sub_folder_1)
@@ -139,9 +142,9 @@ def test_get_any_actions_when_both_folders_is_synced(tmp_source, tmp_destination
 
     for file_create in LEVEL_2:
         create_tmp_file(src_tmp_sub_folder, file_create["name"], file_create["content"])
-        create_tmp_file(
-            dest_tmp_sub_folder, file_create["name"], file_create["content"]
-        )
+        src_file = os.path.join(str(src_tmp_sub_folder), file_create["name"])
+        dest_file = os.path.join(str(dest_tmp_sub_folder), file_create["name"])
+        shutil.copy2(src_file, dest_file)
 
     folder_settings = FolderSettingsDataClass(
         source=str(tmp_source), destination=str(tmp_destination)
