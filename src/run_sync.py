@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     # Optional argument
     parser.add_argument("-s", "--sha256", action="store_true", default=False,
-        help="diff files line by line using sha256 hash strategy")
+        help="diff files using sha256 hash strategy")
 
     parser.add_argument(
         "--version",
