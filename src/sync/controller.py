@@ -47,5 +47,6 @@ class SyncController:  #pylint: disable=too-few-public-methods
             callable_action = self._map_actions.get(diff.action)
 
             if callable_action:
-                callable_action(path=os.path.join(diff.common_root, diff.name))
-                self._logger.info(f"sync action {diff.action.value} complete")
+                path = os.path.join(diff.common_root, diff.name)
+                callable_action(path=path)
+                self._logger.info("sync %s complete on %s", diff.action.value, path)
